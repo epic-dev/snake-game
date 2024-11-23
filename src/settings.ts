@@ -15,6 +15,6 @@ export const settings: BaseSettings = {
         x: 400,
         y: 300,
     },
-    direction: Directions.Right,
-    color: 'green',
+    direction: Directions.Up,
+    snakeColor: 'green',
 }

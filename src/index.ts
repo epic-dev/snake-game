@@ -1,5 +1,5 @@
 import { Directions, settings } from "./settings";
-import { Position } from "./types";
+import { Direction, Position } from "./types";
 import { createRect } from "./utils";
 
 // enum Food {
@@ -25,10 +25,11 @@ import { createRect } from "./utils";
 // ]);
 
 
-const GameSpeed = 100;
 const Snake: Position[] = [settings.startingPosition];
-let currentDirection = Directions.Right; // initial direction: ;
-let frame: SVGElement;
+
+let currentDirection: Direction['Left'] | Direction['Right'] | Direction['Up'] | Direction['Down'] | null = null
+
+let pane: SVGElement;
 let food: Position = produceFood();
 
 function produceFood(): Position {
@@ -45,8 +46,8 @@ function init() {
 function update() {
     // update game settings, snake positioning and food cells position
     const newHead = {
-        x: Snake[0].x + currentDirection.x * settings.cellSize,
-        y: Snake[0].y + currentDirection.y * settings.cellSize,
+        x: Snake[0].x + (currentDirection?.x ?? 1) * settings.cellSize,
+        y: Snake[0].y + (currentDirection?.y ?? 0 )* settings.cellSize,
     }
     Snake.unshift(newHead);
     if (newHead.x === food.x && newHead.y === food.y) {
@@ -62,7 +63,7 @@ function update() {
 
 function createSnakeSegment(pos: Position): SVGRectElement {
     const snakeSegmentSize = settings.cellSize;
-    const snakeColor = settings.color;
+    const snakeColor = settings.snakeColor;
     return createRect({
         position: pos,
         size: snakeSegmentSize,
@@ -77,12 +78,12 @@ function createFoodElement(food: Position): SVGRectElement {
     });
 }
 function render() {
-    frame.innerHTML = '';
+    pane.innerHTML = '';
     Snake.forEach((s) => {
         const segment = createSnakeSegment(s);
-        frame.appendChild(segment)
+        pane.appendChild(segment)
     });
-    frame.appendChild(createFoodElement(food))
+    pane.appendChild(createFoodElement(food))
 }
 
 // enum GameStates {
@@ -108,28 +109,36 @@ function render() {
 //     }]
 // ]);
 
-let isRunning = false;
-let timeoutId: number;
+let afId: number | null = null;
+let frameLastUpdateTime = 0;
+const Second = 1000;
+const GameSpeed = 10; // cells per second
 /**
  * Game starter
  */
-function loop() {
+function loop(frameCurrentTime: number) {
+    const delta = (frameCurrentTime - frameLastUpdateTime) / Second;
+    if (delta < 1 / GameSpeed) {
+        afId = requestAnimationFrame(loop);
+        return
+    }
+    frameLastUpdateTime = frameCurrentTime;
     update();
     render();
-    timeoutId = setTimeout(loop, GameSpeed);
+
+    afId = requestAnimationFrame(loop);
 }
 
 function start(): number | null {
-    if (!isRunning) {
-        isRunning = true;
-        loop();
+    if (afId === null) {
+        afId = requestAnimationFrame(loop);
     }
     return null;
 }
-function pause(game: number) {
-    if (isRunning) {
-        clearTimeout(game);
-        isRunning = false;
+function pause() {
+    if (afId !== null) {
+        cancelAnimationFrame(afId);
+        afId = null;
     }
 }
 
@@ -137,12 +146,12 @@ function pause(game: number) {
  * Entry point
 */
 document.addEventListener('DOMContentLoaded', () => {
-    frame = document.getElementById('frame') as unknown as SVGElement;
+    pane = document.getElementById('frame') as unknown as SVGElement;
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
-                if (isRunning) {
-                    pause(timeoutId)
+                if (afId !== null) {
+                    pause()
                 } else start();
                 break;
             }
@@ -150,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowUp': {
                 if (currentDirection !== Directions.Down)
                     currentDirection = Directions.Up;
-                if (!isRunning)
+                if (afId === null)
                     start();
                 break;
             }
@@ -158,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowRight': {
                 if (currentDirection !== Directions.Left)
                     currentDirection = Directions.Right;
-                if (!isRunning)
+                if (afId === null)
                     start();
                 break;
             }
@@ -166,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowLeft': {
                 if (currentDirection !== Directions.Right)
                     currentDirection = Directions.Left;
-                if (!isRunning)
+                if (afId === null)
                     start();
                 break;
             }
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowDown': {
                 if (currentDirection !== Directions.Up)
                     currentDirection = Directions.Down;
-                if (!isRunning)
+                if (!afId)
                     start();
                 break;
             }
@@ -182,3 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     init();
 });
+
+// TODO unit tests
+// - food production function
+// - next head position function

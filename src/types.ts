@@ -16,5 +16,5 @@ export type BaseSettings = {
     cellSize: number, // cell size in pixels
     startingPosition: Position,
     direction: Position,
-    color: string,
+    snakeColor: string,
 }
