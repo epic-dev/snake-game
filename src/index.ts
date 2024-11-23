@@ -25,21 +25,21 @@ import { createRect } from "./utils";
 // ]);
 
 
-const GameSpeed = 300;
+const GameSpeed = 100;
 const Snake: Position[] = [settings.startingPosition];
 let currentDirection = Directions.Right; // initial direction: ;
 let frame: SVGElement;
 let food: Position = produceFood();
 
 function produceFood(): Position {
-    const newFood = { x: Math.floor(Math.random() + settings.frameWidth), y: Math.floor(Math.random() + settings.frameHeight)};
-    // createRect(newFood);
-    return newFood;
+    return {
+        x: Math.floor(Math.random() * (settings.frameWidth + 1)) * settings.cellSize,
+        y: Math.floor(Math.random() * (settings.frameHeight + 1)) * settings.cellSize,
+    };
 }
 
 function init() {
     // initialize board, game settings and initial position 
-    console.log('init global vars')
 }
 
 function update() {
@@ -148,26 +148,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             case 'w':
             case 'ArrowUp': {
-                currentDirection = Directions.Up;
-                if (!isRunning) { start(); }
+                if (currentDirection !== Directions.Down)
+                    currentDirection = Directions.Up;
+                if (!isRunning)
+                    start();
                 break;
             }
             case 'd':
             case 'ArrowRight': {
-                currentDirection = Directions.Right;
-                if (!isRunning) { start(); }
+                if (currentDirection !== Directions.Left)
+                    currentDirection = Directions.Right;
+                if (!isRunning)
+                    start();
                 break;
             }
             case 'a':
             case 'ArrowLeft': {
-                currentDirection = Directions.Left;
-                if (!isRunning) { start(); }
+                if (currentDirection !== Directions.Right)
+                    currentDirection = Directions.Left;
+                if (!isRunning)
+                    start();
                 break;
             }
             case 's':
             case 'ArrowDown': {
-                currentDirection = Directions.Down;
-                if (!isRunning) { start(); }
+                if (currentDirection !== Directions.Up)
+                    currentDirection = Directions.Down;
+                if (!isRunning)
+                    start();
                 break;
             }
         }
