@@ -18,3 +18,25 @@ export const settings: BaseSettings = {
     direction: Directions.Up,
     snakeColor: 'green',
 }
+
+export enum Food {
+    Cherries,
+    Mushrooms,
+    Pizza,
+}
+
+export enum SideEffects {
+    InvertedDirections,
+    SpeedBoost,
+}
+
+export const FoodSideEffects = new Map<Food, SideEffects>([
+    [Food.Mushrooms, SideEffects.InvertedDirections],
+    [Food.Pizza, SideEffects.SpeedBoost]
+]);
+
+export const FoodPoints = new Map<Food, number>([
+    [Food.Cherries, 100],
+    [Food.Mushrooms, 350],
+    [Food.Pizza, 400],
+]);

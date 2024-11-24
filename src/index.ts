@@ -1,28 +1,6 @@
-import { Directions, settings } from "./settings";
+import { Directions, Food, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
 import { Direction, Position } from "./types";
-import { createRect } from "./utils";
-
-// enum Food {
-//     Cherries,
-//     Mushrooms,
-//     Pizza,
-// }
-
-// enum SideEffects {
-//     InvertedDirections,
-//     SpeedBoost,
-// }
-
-// const FoodSideEffects = new Map<Food, SideEffects>([
-//     [Food.Mushrooms, SideEffects.InvertedDirections],
-//     [Food.Pizza, SideEffects.SpeedBoost]
-// ]);
-
-// const FoodPoints = new Map<Food, number>([
-//     [Food.Cherries, 100],
-//     [Food.Mushrooms, 350],
-//     [Food.Pizza, 400],
-// ]);
+import { createRect, getRandomPosition } from "./utils";
 
 
 const Snake: Position[] = [settings.startingPosition];
@@ -30,12 +8,22 @@ const Snake: Position[] = [settings.startingPosition];
 let currentDirection: Direction['Left'] | Direction['Right'] | Direction['Up'] | Direction['Down'] | null = null
 
 let pane: SVGElement;
-let food: Position = produceFood();
+let scoreElement: HTMLElement;
+let food: FoodItem = produceFoodItem(Food.Cherries);
+let score = 0;
 
-function produceFood(): Position {
+type FoodItem = {
+    position: Position,
+    points: number,
+    effect?: SideEffects,
+}
+function produceFoodItem(food: Food): FoodItem {
+    const newFoodPosition = getRandomPosition()
+// TODO: verify food position to be outside snake segments and not correlated with other food items
     return {
-        x: Math.floor(Math.random() * (settings.frameWidth + 1)) * settings.cellSize,
-        y: Math.floor(Math.random() * (settings.frameHeight + 1)) * settings.cellSize,
+        position: newFoodPosition,
+        points: FoodPoints.get(food)!,
+        effect: FoodSideEffects.get(food),
     };
 }
 
@@ -47,11 +35,12 @@ function update() {
     // update game settings, snake positioning and food cells position
     const newHead = {
         x: Snake[0].x + (currentDirection?.x ?? 1) * settings.cellSize,
-        y: Snake[0].y + (currentDirection?.y ?? 0 )* settings.cellSize,
+        y: Snake[0].y + (currentDirection?.y ?? 0) * settings.cellSize,
     }
     Snake.unshift(newHead);
-    if (newHead.x === food.x && newHead.y === food.y) {
-        food = produceFood();
+    if (newHead.x === food.position.x && newHead.y === food.position.y) {
+        food = produceFoodItem(Food.Cherries); //FIXME based on answer
+        score += food.points;
     } else {
         Snake.pop();
     }
@@ -79,11 +68,13 @@ function createFoodElement(food: Position): SVGRectElement {
 }
 function render() {
     pane.innerHTML = '';
+    scoreElement.innerHTML = String(score);
+    // TODO: probably it is better to build elements first and then append them
     Snake.forEach((s) => {
         const segment = createSnakeSegment(s);
         pane.appendChild(segment)
     });
-    pane.appendChild(createFoodElement(food))
+    pane.appendChild(createFoodElement(food.position))
 }
 
 // enum GameStates {
@@ -147,6 +138,7 @@ function pause() {
 */
 document.addEventListener('DOMContentLoaded', () => {
     pane = document.getElementById('frame') as unknown as SVGElement;
+    scoreElement = document.getElementById('score-value') as unknown as HTMLElement;
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
