@@ -1,13 +1,13 @@
-import { BaseSettings, Direction } from "./types"
+import { TBaseSettings, TDirections } from "./types"
 
-export const Directions: Direction = {
+export const BaseDirections: TDirections = {
     Left: { x: -1, y: 0 },
     Right: { x: 1, y: 0 },
     Up: { x: 0, y: -1 },
     Down: { x: 0, y: 1 },
 }
 
-export const settings: BaseSettings = {
+export const settings: TBaseSettings = {
     frameWidth: 80,
     frameHeight: 60,
     cellSize: 10,
@@ -15,7 +15,7 @@ export const settings: BaseSettings = {
         x: 400,
         y: 300,
     },
-    direction: Directions.Up,
+    direction: BaseDirections.Up,
     snakeColor: 'green',
 }
 

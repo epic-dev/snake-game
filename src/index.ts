@@ -1,19 +1,23 @@
-import { Directions, Food, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
-import { Direction, Position } from "./types";
+import './styles.css';
+import { BaseDirections, Food, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
+import { Mutable, TDirections, TPosition } from "./types";
 import { createRect, getRandomPosition } from "./utils";
 
 
-const Snake: Position[] = [settings.startingPosition];
+const Snake: TPosition[] = [settings.startingPosition];
 
-let currentDirection: Direction['Left'] | Direction['Right'] | Direction['Up'] | Direction['Down'] | null = null
+const currentDirections: Mutable<TDirections> = BaseDirections;
+
+let currentDirection = currentDirections.Up;
 
 let pane: SVGElement;
 let scoreElement: HTMLElement;
 let food: FoodItem = produceFoodItem(Food.Cherries);
 let score = 0;
+let invertedDirections = false;
 
 type FoodItem = {
-    position: Position,
+    position: TPosition,
     points: number,
     effect?: SideEffects,
 }
@@ -31,6 +35,23 @@ function init() {
     // initialize board, game settings and initial position 
 }
 
+function callEffect(effect?: SideEffects): void {
+    switch (effect) {
+        case SideEffects.InvertedDirections: {
+            invertedDirections = true;
+            setTimeout(() => {
+                invertedDirections = false;
+                console.log('CANCEL effect');
+            }, 5000); //FIXME timeout to settings
+            break;
+        }
+        case SideEffects.SpeedBoost: {
+            GameSpeed += 5;
+            break;
+        }
+        default: break;
+    }
+}
 function update() {
     // update game settings, snake positioning and food cells position
     const newHead = {
@@ -39,18 +60,18 @@ function update() {
     }
     Snake.unshift(newHead);
     if (newHead.x === food.position.x && newHead.y === food.position.y) {
-        food = produceFoodItem(Food.Cherries); //FIXME based on answer
+        food = produceFoodItem(Food.Mushrooms); //FIXME based on answer
         score += food.points;
+        callEffect(food.effect);
     } else {
         Snake.pop();
     }
-
-    
+    console.log(currentDirection === currentDirections.Left ? 'Left' : currentDirection === currentDirections.Right ? 'Right' : currentDirection === currentDirections.Up ? 'Up' : 'Down');
     // stop game if new head position is equal frame border position
 }
 
 
-function createSnakeSegment(pos: Position): SVGRectElement {
+function createSnakeSegment(pos: TPosition): SVGRectElement {
     const snakeSegmentSize = settings.cellSize;
     const snakeColor = settings.snakeColor;
     return createRect({
@@ -59,7 +80,7 @@ function createSnakeSegment(pos: Position): SVGRectElement {
         color: snakeColor,
     });
 }
-function createFoodElement(food: Position): SVGRectElement {
+function createFoodElement(food: TPosition): SVGRectElement {
     return createRect({
         position: food,
         size: settings.cellSize,
@@ -103,7 +124,7 @@ function render() {
 let afId: number | null = null;
 let frameLastUpdateTime = 0;
 const Second = 1000;
-const GameSpeed = 10; // cells per second
+let GameSpeed = 5; // cells per second
 /**
  * Game starter
  */
@@ -132,7 +153,22 @@ function pause() {
         afId = null;
     }
 }
-
+function moveUp() {
+    if (currentDirection !== currentDirections.Down)
+        currentDirection = currentDirections.Up;
+}
+function moveDown() {
+    if (currentDirection !== currentDirections.Up)
+        currentDirection = currentDirections.Down;
+}
+function moveRight() {
+    if (currentDirection !== currentDirections.Left)
+        currentDirection = currentDirections.Right;
+}
+function moveLeft() {
+    if (currentDirection !== currentDirections.Right)
+        currentDirection = currentDirections.Left;
+}
 /** 
  * Entry point
 */
@@ -144,39 +180,33 @@ document.addEventListener('DOMContentLoaded', () => {
             case ' ': {
                 if (afId !== null) {
                     pause()
-                } else start();
+                } else {
+                    start();
+                }
                 break;
             }
             case 'w':
             case 'ArrowUp': {
-                if (currentDirection !== Directions.Down)
-                    currentDirection = Directions.Up;
-                if (afId === null)
-                    start();
+                if (invertedDirections) { moveDown() } else moveUp();
+                start();
                 break;
             }
             case 'd':
             case 'ArrowRight': {
-                if (currentDirection !== Directions.Left)
-                    currentDirection = Directions.Right;
-                if (afId === null)
-                    start();
+                if (invertedDirections) { moveLeft() } else moveRight();
+                start();
                 break;
             }
             case 'a':
             case 'ArrowLeft': {
-                if (currentDirection !== Directions.Right)
-                    currentDirection = Directions.Left;
-                if (afId === null)
-                    start();
+                if (invertedDirections) { moveRight() } else moveLeft();
+                start();
                 break;
             }
             case 's':
             case 'ArrowDown': {
-                if (currentDirection !== Directions.Up)
-                    currentDirection = Directions.Down;
-                if (!afId)
-                    start();
+                if (invertedDirections) { moveUp() } else moveDown();
+                start();
                 break;
             }
         }

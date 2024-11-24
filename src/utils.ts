@@ -1,7 +1,7 @@
 import { settings } from "./settings";
-import { Position } from "./types";
+import { TPosition } from "./types";
 
-type RectangleAttributes = { position: Position; size: number; color: string; };
+type RectangleAttributes = { position: TPosition; size: number; color: string; };
 export function createRect(attributes: RectangleAttributes): SVGRectElement {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", `${attributes.position.x}`);
@@ -12,7 +12,7 @@ export function createRect(attributes: RectangleAttributes): SVGRectElement {
     return rect;
 }
 
-export function getRandomPosition(): Position {
+export function getRandomPosition(): TPosition {
     const maxX = settings.frameWidth * settings.cellSize - settings.cellSize;
     const maxY = settings.frameHeight * settings.cellSize - settings.cellSize;
     return {

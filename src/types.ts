@@ -1,20 +1,24 @@
-export type Position = {
+export type Mutable<T> = {
+    -readonly [P in keyof T]: T[P];
+}
+
+export type TPosition = {
     x: number,
     y: number,
 }
 
-export type Direction = {
-    Left: { [key in keyof Position]: Position[key] },
-    Right: { [key in keyof Position]: Position[key] },
-    Up: { [key in keyof Position]: Position[key] },
-    Down: { [key in keyof Position]: Position[key] },
+export type TDirections = {
+    readonly Left: { [key in keyof TPosition]: TPosition[key] },
+    readonly Right: { [key in keyof TPosition]: TPosition[key] },
+    readonly Up: { [key in keyof TPosition]: TPosition[key] },
+    readonly Down: { [key in keyof TPosition]: TPosition[key] },
 }
 
-export type BaseSettings = {
+export type TBaseSettings = {
     frameWidth: number, // number of cells horizontally
     frameHeight: number, // number of cells vertically
     cellSize: number, // cell size in pixels
-    startingPosition: Position,
-    direction: Position,
+    startingPosition: TPosition,
+    direction: TPosition,
     snakeColor: string,
 }
