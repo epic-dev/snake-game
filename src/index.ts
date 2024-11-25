@@ -41,7 +41,6 @@ function callEffect(effect?: SideEffects): void {
             invertedDirections = true;
             setTimeout(() => {
                 invertedDirections = false;
-                console.log('CANCEL effect');
             }, 5000); //FIXME timeout to settings
             break;
         }
@@ -66,7 +65,7 @@ function update() {
     } else {
         Snake.pop();
     }
-    console.log(currentDirection === currentDirections.Left ? 'Left' : currentDirection === currentDirections.Right ? 'Right' : currentDirection === currentDirections.Up ? 'Up' : 'Down');
+    // console.log(currentDirection === currentDirections.Left ? 'Left' : currentDirection === currentDirections.Right ? 'Right' : currentDirection === currentDirections.Up ? 'Up' : 'Down');
     // stop game if new head position is equal frame border position
 }
 
@@ -173,8 +172,9 @@ function moveLeft() {
  * Entry point
 */
 document.addEventListener('DOMContentLoaded', () => {
-    pane = document.getElementById('frame') as unknown as SVGElement;
+    pane = document.getElementById('game-board') as unknown as SVGElement;
     scoreElement = document.getElementById('score-value') as unknown as HTMLElement;
+    const welcomeMessage = document.getElementById('welcome-message') as unknown as HTMLElement;
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
@@ -207,6 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ArrowDown': {
                 if (invertedDirections) { moveUp() } else moveDown();
                 start();
+                break;
+            }
+            default: {
+                console.log('default');
+                welcomeMessage.classList.add('hidden');
                 break;
             }
         }

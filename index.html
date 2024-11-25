@@ -7,16 +7,38 @@
         <link rel="stylesheet" href="./src/styles.css">
     </head>
     <body>
-        <div id="app">
-            <div class="grid">
-                <div class="grid-item">Score: <span id="score-value"></span></div>
-                <div class="grid-item">
-                    <svg id="frame" xmlns="http://www.w3.org/2000/svg" width="800" height="600">
-                        <rect x="400" y="300" width="10" height="10" color="green"></rect>
+        <main class="game-container">
+            <section class="game-panel">
+                <section class="controls-bar">
+                    <!-- Difficulty level: <select name="difficulty">
+                        <option value="1">easy</option>
+                        <option value="2">medium</option>
+                        <option value="3">hard</option>
+                    </select> -->
+
+                    <div class="score">
+                        Score: <span id="score-value">0</span>
+                    </div>
+                    <div class="controls">
+                        <button type="button" class="button restart-btn" title="Restart"></button>
+                        <button type="button" class="button settings-btn" title="Game settings"></button>
+                    </div>
+                </section>
+                <section class="">
+                    <svg id="game-board" xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 100 100">
+                        <rect x="200" y="300" width="10" height="10" fill="green"></rect>
+                        <rect x="600" y="300" width="10" height="10" fill="red"></rect>
                     </svg>
                 </div>
-            </div>
+            </section>
+        </main>
+        <!-- <div class="dialog welcome-message">
+            <p>Press <b>'Space'</b>, <b>'WASD'</b> or arrow keys to start the game</p>
         </div>
+        <div class="dialog gameover-message">
+            <p>Game over ;(</p>
+        </div> -->
+
         <script type="module" src="./src/index.ts"></script>
     </body>
 </html>
