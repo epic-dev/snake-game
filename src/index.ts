@@ -62,9 +62,9 @@ function update() {
     Snake.unshift(newHead);
 
     if (isEaten(newHead, currentFoodItem)) {
-        currentFoodItem = produceFoodItem();
-        score += currentFoodItem.points;
         callEffect(currentFoodItem.effect);
+        score += currentFoodItem.points;
+        currentFoodItem = produceFoodItem();
     } else {
         Snake.pop();
     }
