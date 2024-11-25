@@ -1,7 +1,8 @@
 import './styles.css';
-import { BaseDirections, Food, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
-import { Mutable, TDirections, TPosition } from "./types";
-import { createRect, getRandomPosition } from "./utils";
+import { BaseDirections, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
+import { FoodItem, Mutable, TDirections, TPosition } from "./types";
+import { createRect, createUseElement } from "./utils";
+import { isEaten, getRandomPosition, getRandomFood } from './mechanics';
 
 
 const Snake: TPosition[] = [settings.startingPosition];
@@ -10,24 +11,23 @@ const currentDirections: Mutable<TDirections> = BaseDirections;
 
 let currentDirection = currentDirections.Up;
 
-let pane: SVGElement;
+let gameBoard: SVGElement;
 let scoreElement: HTMLElement;
-let food: FoodItem = produceFoodItem(Food.Cherries);
+let dialogs: HTMLElement[];
+let currentFoodItem: FoodItem = produceFoodItem();
 let score = 0;
 let invertedDirections = false;
 
-type FoodItem = {
-    position: TPosition,
-    points: number,
-    effect?: SideEffects,
-}
-function produceFoodItem(food: Food): FoodItem {
-    const newFoodPosition = getRandomPosition()
-// TODO: verify food position to be outside snake segments and not correlated with other food items
+
+function produceFoodItem(): FoodItem {
+    const position = getRandomPosition();
+    const { ref, food } = getRandomFood();
+    // TODO: verify food position to be outside snake segments and not correlated with other food items
     return {
-        position: newFoodPosition,
+        position,
         points: FoodPoints.get(food)!,
         effect: FoodSideEffects.get(food),
+        ref: `#${ref}`,
     };
 }
 
@@ -35,6 +35,7 @@ function init() {
     // initialize board, game settings and initial position 
 }
 
+// FIXME make it a generic object
 function callEffect(effect?: SideEffects): void {
     switch (effect) {
         case SideEffects.InvertedDirections: {
@@ -51,6 +52,7 @@ function callEffect(effect?: SideEffects): void {
         default: break;
     }
 }
+
 function update() {
     // update game settings, snake positioning and food cells position
     const newHead = {
@@ -58,10 +60,11 @@ function update() {
         y: Snake[0].y + (currentDirection?.y ?? 0) * settings.cellSize,
     }
     Snake.unshift(newHead);
-    if (newHead.x === food.position.x && newHead.y === food.position.y) {
-        food = produceFoodItem(Food.Mushrooms); //FIXME based on answer
-        score += food.points;
-        callEffect(food.effect);
+
+    if (isEaten(newHead, currentFoodItem)) {
+        currentFoodItem = produceFoodItem();
+        score += currentFoodItem.points;
+        callEffect(currentFoodItem.effect);
     } else {
         Snake.pop();
     }
@@ -79,22 +82,18 @@ function createSnakeSegment(pos: TPosition): SVGRectElement {
         color: snakeColor,
     });
 }
-function createFoodElement(food: TPosition): SVGRectElement {
-    return createRect({
-        position: food,
-        size: settings.cellSize,
-        color: 'red',
-    });
+function createFoodElement(foodItem: FoodItem): SVGRectElement | SVGUseElement {
+    return createUseElement({ position: foodItem.position, ref: foodItem.ref });
 }
 function render() {
-    pane.innerHTML = '';
+    gameBoard.innerHTML = '';
     scoreElement.innerHTML = String(score);
     // TODO: probably it is better to build elements first and then append them
     Snake.forEach((s) => {
         const segment = createSnakeSegment(s);
-        pane.appendChild(segment)
+        gameBoard.appendChild(segment)
     });
-    pane.appendChild(createFoodElement(food.position))
+    gameBoard.appendChild(createFoodElement(currentFoodItem))
 }
 
 // enum GameStates {
@@ -120,6 +119,7 @@ function render() {
 //     }]
 // ]);
 
+let isStarted = false;
 let afId: number | null = null;
 let frameLastUpdateTime = 0;
 const Second = 1000;
@@ -134,7 +134,9 @@ function loop(frameCurrentTime: number) {
         return
     }
     frameLastUpdateTime = frameCurrentTime;
+
     update();
+
     render();
 
     afId = requestAnimationFrame(loop);
@@ -142,7 +144,9 @@ function loop(frameCurrentTime: number) {
 
 function start(): number | null {
     if (afId === null) {
+        isStarted = true;
         afId = requestAnimationFrame(loop);
+        dialogs.forEach(dialog => dialog.classList.add('hidden'))
     }
     return null;
 }
@@ -172,9 +176,10 @@ function moveLeft() {
  * Entry point
 */
 document.addEventListener('DOMContentLoaded', () => {
-    pane = document.getElementById('game-board') as unknown as SVGElement;
+    gameBoard = document.getElementById('game-board-field') as unknown as SVGElement;
     scoreElement = document.getElementById('score-value') as unknown as HTMLElement;
-    const welcomeMessage = document.getElementById('welcome-message') as unknown as HTMLElement;
+    dialogs = document.querySelectorAll('.dialog') as unknown as HTMLElement[];
+
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
@@ -211,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             default: {
                 console.log('default');
-                welcomeMessage.classList.add('hidden');
+                // welcomeMessage.classList.add('hidden');
                 break;
             }
         }

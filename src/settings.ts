@@ -17,6 +17,8 @@ export const settings: TBaseSettings = {
     },
     direction: BaseDirections.Up,
     snakeColor: 'green',
+    numberOfAllFoodItems: 3,
+    numberOfFoodItemsOnBoard: 1,
 }
 
 export enum Food {

@@ -1,7 +1,7 @@
-import { settings } from "./settings";
 import { TPosition } from "./types";
 
 type RectangleAttributes = { position: TPosition; size: number; color: string; };
+type UseElementAttributes = { position: TPosition; ref: string; }
 export function createRect(attributes: RectangleAttributes): SVGRectElement {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", `${attributes.position.x}`);
@@ -11,12 +11,10 @@ export function createRect(attributes: RectangleAttributes): SVGRectElement {
     rect.setAttribute("fill", attributes.color);
     return rect;
 }
-
-export function getRandomPosition(): TPosition {
-    const maxX = settings.frameWidth * settings.cellSize - settings.cellSize;
-    const maxY = settings.frameHeight * settings.cellSize - settings.cellSize;
-    return {
-        x: Math.floor(Math.random() * (maxX / settings.cellSize + 1)) * settings.cellSize,
-        y: Math.floor(Math.random() * (maxY / settings.cellSize + 1)) * settings.cellSize,
-    };
+export function createUseElement(attributes: UseElementAttributes): SVGUseElement {
+    const useElement = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    useElement.setAttribute('x', `${attributes.position.x}`)
+    useElement.setAttribute('y', `${attributes.position.y}`)
+    useElement.setAttribute('href', `${attributes.ref}`)
+    return useElement;
 }

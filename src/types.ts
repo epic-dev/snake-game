@@ -1,3 +1,5 @@
+import { SideEffects } from "./settings"
+
 export type Mutable<T> = {
     -readonly [P in keyof T]: T[P];
 }
@@ -21,4 +23,13 @@ export type TBaseSettings = {
     startingPosition: TPosition,
     direction: TPosition,
     snakeColor: string,
+    numberOfAllFoodItems: number,
+    numberOfFoodItemsOnBoard: number,
+}
+
+export type FoodItem = {
+    position: TPosition,
+    points: number,
+    effect?: SideEffects,
+    ref: string, // svg reference
 }
