@@ -1,8 +1,8 @@
 import './styles.css';
-import { BaseDirections, FoodPoints, FoodSideEffects, settings, SideEffects } from "./settings";
+import { BaseDirections, settings, SideEffects } from "./settings";
 import { FoodItem, Mutable, TDirections, TPosition } from "./types";
 import { createRect, createUseElement } from "./utils";
-import { isEaten, getRandomPosition, getRandomFood } from './mechanics';
+import { isEaten, produceFoodItem, collision } from './mechanics';
 
 
 const Snake: TPosition[] = [settings.startingPosition];
@@ -19,24 +19,12 @@ let score = 0;
 let invertedDirections = false;
 
 
-function produceFoodItem(): FoodItem {
-    const position = getRandomPosition();
-    const { ref, food } = getRandomFood();
-    // TODO: verify food position to be outside snake segments and not correlated with other food items
-    return {
-        position,
-        points: FoodPoints.get(food)!,
-        effect: FoodSideEffects.get(food),
-        ref: `#${ref}`,
-    };
-}
-
 function init() {
     // initialize board, game settings and initial position 
 }
 
 // FIXME make it a generic object
-function callEffect(effect?: SideEffects): void {
+export function callEffect(effect?: SideEffects): void {
     switch (effect) {
         case SideEffects.InvertedDirections: {
             invertedDirections = true;
@@ -60,6 +48,11 @@ function update() {
         y: Snake[0].y + (currentDirection?.y ?? 0) * settings.cellSize,
     }
     Snake.unshift(newHead);
+
+    if (collision(Snake)) {
+        stopGame();
+        return
+    }
 
     if (isEaten(newHead, currentFoodItem)) {
         callEffect(currentFoodItem.effect);
@@ -119,15 +112,17 @@ function render() {
 //     }]
 // ]);
 
-let isStarted = false;
+// let isStarted = false;
 let afId: number | null = null;
 let frameLastUpdateTime = 0;
 const Second = 1000;
 let GameSpeed = 5; // cells per second
+let gameOver = false;
 /**
  * Game starter
  */
 function loop(frameCurrentTime: number) {
+    if (gameOver) { return; }
     const delta = (frameCurrentTime - frameLastUpdateTime) / Second;
     if (delta < 1 / GameSpeed) {
         afId = requestAnimationFrame(loop);
@@ -142,18 +137,27 @@ function loop(frameCurrentTime: number) {
     afId = requestAnimationFrame(loop);
 }
 
-function start(): number | null {
+function startGame(): number | null {
     if (afId === null) {
-        isStarted = true;
+        // isStarted = true;
         afId = requestAnimationFrame(loop);
         dialogs.forEach(dialog => dialog.classList.add('hidden'))
     }
     return null;
 }
-function pause() {
+function pauseGame() {
     if (afId !== null) {
         cancelAnimationFrame(afId);
         afId = null;
+    }
+}
+
+function stopGame() {
+    gameOver = true;
+    if (afId !== null) {
+        cancelAnimationFrame(afId);
+        afId = null;
+        dialogs.forEach(dialog => dialog.classList.remove('hidden'))
     }
 }
 function moveUp() {
@@ -184,34 +188,34 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (e.key) {
             case ' ': {
                 if (afId !== null) {
-                    pause()
+                    pauseGame()
                 } else {
-                    start();
+                    startGame();
                 }
                 break;
             }
             case 'w':
             case 'ArrowUp': {
                 if (invertedDirections) { moveDown() } else moveUp();
-                start();
+                startGame();
                 break;
             }
             case 'd':
             case 'ArrowRight': {
                 if (invertedDirections) { moveLeft() } else moveRight();
-                start();
+                startGame();
                 break;
             }
             case 'a':
             case 'ArrowLeft': {
                 if (invertedDirections) { moveRight() } else moveLeft();
-                start();
+                startGame();
                 break;
             }
             case 's':
             case 'ArrowDown': {
                 if (invertedDirections) { moveUp() } else moveDown();
-                start();
+                startGame();
                 break;
             }
             default: {

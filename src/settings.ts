@@ -19,6 +19,7 @@ export const settings: TBaseSettings = {
     snakeColor: 'green',
     numberOfAllFoodItems: 3,
     numberOfFoodItemsOnBoard: 1,
+    foodItemSize: 20,
 }
 
 export enum Food {

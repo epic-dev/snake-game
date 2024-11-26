@@ -1,4 +1,4 @@
-import { Food, settings } from "./settings";
+import { Food, FoodPoints, FoodSideEffects, settings } from "./settings";
 import { FoodItem, TPosition } from "./types";
 
 export function isEaten(headPosition: TPosition, food: FoodItem): boolean {
@@ -8,10 +8,21 @@ export function isEaten(headPosition: TPosition, food: FoodItem): boolean {
 
     return equalPositions || (isSurroundingsOfX && isSurroundingsOfY);
 }
+
+// TODO unit tests
+export function collision(snake: TPosition[]): boolean {
+    const headPosition = snake[0];
+    const tail = snake.slice(1);
+    const collideX = headPosition.x < 0 || headPosition.x === settings.frameWidth * settings.cellSize - settings.cellSize;
+    const collideY = headPosition.y < 0 || headPosition.y === settings.frameHeight * settings.cellSize - settings.cellSize;
+
+    return collideX || collideY || !!tail.find(t => t.x === headPosition.x && t.y === headPosition.y);
+}
+
 // TODO unit tests to check corner cases: of frame size, cell size
-export function getRandomPosition(): TPosition {
-    const maxX = settings.frameWidth * settings.cellSize - settings.cellSize;
-    const maxY = settings.frameHeight * settings.cellSize - settings.cellSize;
+export function getFoodRandomPosition(): TPosition {
+    const maxX = settings.frameWidth * settings.cellSize - settings.foodItemSize;
+    const maxY = settings.frameHeight * settings.cellSize - settings.foodItemSize;
     return {
         x: Math.floor(Math.random() * (maxX / settings.cellSize + 1)) * settings.cellSize,
         y: Math.floor(Math.random() * (maxY / settings.cellSize + 1)) * settings.cellSize,
@@ -30,5 +41,17 @@ export function getRandomFood(): { ref: string, food: Food} {
     return {
         ref,
         food: reverseMappingIndex,
+    };
+}
+
+export function produceFoodItem(): FoodItem {
+    const position = getFoodRandomPosition();
+    const { ref, food } = getRandomFood();
+    // TODO: verify food position to be outside snake segments and not correlated with other food items
+    return {
+        position,
+        points: FoodPoints.get(food)!,
+        effect: FoodSideEffects.get(food),
+        ref: `#${ref}`,
     };
 }

@@ -25,6 +25,7 @@ export type TBaseSettings = {
     snakeColor: string,
     numberOfAllFoodItems: number,
     numberOfFoodItemsOnBoard: number,
+    foodItemSize: number,
 }
 
 export type FoodItem = {
