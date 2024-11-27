@@ -1,4 +1,4 @@
-import { Food, FoodPoints, FoodSideEffects, settings } from "./settings";
+import { BaseDirections, Food, FoodPoints, FoodSideEffects, settings } from "./settings";
 import { FoodItem, TPosition } from "./types";
 
 export function isEaten(headPosition: TPosition, food: FoodItem): boolean {
@@ -54,4 +54,25 @@ export function produceFoodItem(): FoodItem {
         effect: FoodSideEffects.get(food),
         ref: `#${ref}`,
     };
+}
+
+export function moveUp(currentDirection: { [key in keyof TPosition]: TPosition[key]; }) {
+    if (currentDirection !== BaseDirections.Down)
+        currentDirection = BaseDirections.Up;
+    return currentDirection;
+}
+export function moveDown(currentDirection: { [key in keyof TPosition]: TPosition[key]; }) {
+    if (currentDirection !== BaseDirections.Up)
+        currentDirection = BaseDirections.Down;
+    return currentDirection;
+}
+export function moveRight(currentDirection: { [key in keyof TPosition]: TPosition[key]; }) {
+    if (currentDirection !== BaseDirections.Left)
+        currentDirection = BaseDirections.Right;
+    return currentDirection;
+}
+export function moveLeft(currentDirection: { [key in keyof TPosition]: TPosition[key]; }) {
+    if (currentDirection !== BaseDirections.Right)
+        currentDirection = BaseDirections.Left;
+    return currentDirection;
 }

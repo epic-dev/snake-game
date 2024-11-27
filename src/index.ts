@@ -1,15 +1,13 @@
 import './styles.css';
 import { BaseDirections, settings, SideEffects } from "./settings";
-import { FoodItem, Mutable, TDirections, TPosition } from "./types";
-import { createRect, createUseElement } from "./utils";
-import { isEaten, produceFoodItem, collision } from './mechanics';
+import { FoodItem, TPosition } from "./types";
+import { collision, isEaten, moveDown, moveLeft, moveRight, moveUp, produceFoodItem } from './mechanics';
+import { createFoodElement, createSnakeSegment } from "./utils";
 
 
 const Snake: TPosition[] = [settings.startingPosition];
 
-const currentDirections: Mutable<TDirections> = BaseDirections;
-
-let currentDirection = currentDirections.Up;
+let currentDirection = BaseDirections.Up;
 
 let gameBoard: SVGElement;
 let scoreElement: HTMLElement;
@@ -19,9 +17,9 @@ let score = 0;
 let invertedDirections = false;
 
 
-function init() {
-    // initialize board, game settings and initial position 
-}
+// function init() {
+//     // initialize board, game settings and initial position 
+// }
 
 // FIXME make it a generic object
 export function callEffect(effect?: SideEffects): void {
@@ -34,7 +32,7 @@ export function callEffect(effect?: SideEffects): void {
             break;
         }
         case SideEffects.SpeedBoost: {
-            GameSpeed += 5;
+            GameSpeed = Math.min(GameSpeed + 5, settings.maxGameSpeed);
             break;
         }
         default: break;
@@ -44,8 +42,8 @@ export function callEffect(effect?: SideEffects): void {
 function update() {
     // update game settings, snake positioning and food cells position
     const newHead = {
-        x: Snake[0].x + (currentDirection?.x ?? 1) * settings.cellSize,
-        y: Snake[0].y + (currentDirection?.y ?? 0) * settings.cellSize,
+        x: Snake[0].x + (currentDirection?.x ?? BaseDirections.Right.x) * settings.cellSize,
+        y: Snake[0].y + (currentDirection?.y ?? BaseDirections.Right.y) * settings.cellSize,
     }
     Snake.unshift(newHead);
 
@@ -61,32 +59,18 @@ function update() {
     } else {
         Snake.pop();
     }
-    // console.log(currentDirection === currentDirections.Left ? 'Left' : currentDirection === currentDirections.Right ? 'Right' : currentDirection === currentDirections.Up ? 'Up' : 'Down');
-    // stop game if new head position is equal frame border position
 }
 
-
-function createSnakeSegment(pos: TPosition): SVGRectElement {
-    const snakeSegmentSize = settings.cellSize;
-    const snakeColor = settings.snakeColor;
-    return createRect({
-        position: pos,
-        size: snakeSegmentSize,
-        color: snakeColor,
-    });
-}
-function createFoodElement(foodItem: FoodItem): SVGRectElement | SVGUseElement {
-    return createUseElement({ position: foodItem.position, ref: foodItem.ref });
-}
 function render() {
-    gameBoard.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     scoreElement.innerHTML = String(score);
-    // TODO: probably it is better to build elements first and then append them
     Snake.forEach((s) => {
         const segment = createSnakeSegment(s);
-        gameBoard.appendChild(segment)
+        fragment.appendChild(segment);
     });
-    gameBoard.appendChild(createFoodElement(currentFoodItem))
+    fragment.appendChild(createFoodElement(currentFoodItem));
+    gameBoard.innerHTML = '';
+    gameBoard.appendChild(fragment);
 }
 
 // enum GameStates {
@@ -118,12 +102,15 @@ let frameLastUpdateTime = 0;
 const Second = 1000;
 let GameSpeed = 5; // cells per second
 let gameOver = false;
+
 /**
- * Game starter
+ * Main game loop
  */
 function loop(frameCurrentTime: number) {
     if (gameOver) { return; }
+
     const delta = (frameCurrentTime - frameLastUpdateTime) / Second;
+
     if (delta < 1 / GameSpeed) {
         afId = requestAnimationFrame(loop);
         return
@@ -136,15 +123,26 @@ function loop(frameCurrentTime: number) {
 
     afId = requestAnimationFrame(loop);
 }
-
+/**
+ * Starts the game loop if it is not already running.
+ * @returns {number | null} The animation frame ID or null if the game is already running.
+ */
 function startGame(): number | null {
+    // Check if the game loop is not already running
     if (afId === null) {
-        // isStarted = true;
+
         afId = requestAnimationFrame(loop);
+
         dialogs.forEach(dialog => dialog.classList.add('hidden'))
     }
     return null;
 }
+
+/**
+ * Pauses the game by canceling the animation frame.
+ * If `afId` is not null, it means the game is currently running.
+ * Cancels the animation frame and sets `afId` to null to indicate the game is paused.
+ */
 function pauseGame() {
     if (afId !== null) {
         cancelAnimationFrame(afId);
@@ -154,28 +152,15 @@ function pauseGame() {
 
 function stopGame() {
     gameOver = true;
+
     if (afId !== null) {
         cancelAnimationFrame(afId);
         afId = null;
-        dialogs.forEach(dialog => dialog.classList.remove('hidden'))
+
+        dialogs.forEach(dialog => dialog.classList.remove('hidden'));
     }
 }
-function moveUp() {
-    if (currentDirection !== currentDirections.Down)
-        currentDirection = currentDirections.Up;
-}
-function moveDown() {
-    if (currentDirection !== currentDirections.Up)
-        currentDirection = currentDirections.Down;
-}
-function moveRight() {
-    if (currentDirection !== currentDirections.Left)
-        currentDirection = currentDirections.Right;
-}
-function moveLeft() {
-    if (currentDirection !== currentDirections.Right)
-        currentDirection = currentDirections.Left;
-}
+
 /** 
  * Entry point
 */
@@ -196,36 +181,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             case 'w':
             case 'ArrowUp': {
-                if (invertedDirections) { moveDown() } else moveUp();
+                currentDirection = invertedDirections ? moveDown(currentDirection) : moveUp(currentDirection);
                 startGame();
                 break;
             }
             case 'd':
             case 'ArrowRight': {
-                if (invertedDirections) { moveLeft() } else moveRight();
+                currentDirection = invertedDirections ? moveLeft(currentDirection) : moveRight(currentDirection);
                 startGame();
                 break;
             }
             case 'a':
             case 'ArrowLeft': {
-                if (invertedDirections) { moveRight() } else moveLeft();
+                currentDirection = invertedDirections ? moveRight(currentDirection) : moveLeft(currentDirection);
                 startGame();
                 break;
             }
             case 's':
             case 'ArrowDown': {
-                if (invertedDirections) { moveUp() } else moveDown();
+                currentDirection = invertedDirections ? moveUp(currentDirection) : moveDown(currentDirection);
                 startGame();
                 break;
             }
-            default: {
-                console.log('default');
-                // welcomeMessage.classList.add('hidden');
-                break;
-            }
+            default: break;
         }
     });
-    init();
+    // init();
 });
 
 // TODO unit tests

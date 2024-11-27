@@ -1,4 +1,5 @@
-import { TPosition } from "./types";
+import { settings } from "./settings";
+import { FoodItem, TPosition } from "./types";
 
 type RectangleAttributes = { position: TPosition; size: number; color: string; };
 type UseElementAttributes = { position: TPosition; ref: string; }
@@ -17,4 +18,18 @@ export function createUseElement(attributes: UseElementAttributes): SVGUseElemen
     useElement.setAttribute('y', `${attributes.position.y}`)
     useElement.setAttribute('href', `${attributes.ref}`)
     return useElement;
+}
+
+export function createSnakeSegment(pos: TPosition): SVGRectElement {
+    const snakeSegmentSize = settings.cellSize;
+    const snakeColor = settings.snakeColor;
+    return createRect({
+        position: pos,
+        size: snakeSegmentSize,
+        color: snakeColor,
+    });
+}
+
+export function createFoodElement(foodItem: FoodItem): SVGRectElement | SVGUseElement {
+    return createUseElement({ position: foodItem.position, ref: foodItem.ref });
 }

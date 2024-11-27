@@ -20,6 +20,7 @@ export const settings: TBaseSettings = {
     numberOfAllFoodItems: 3,
     numberOfFoodItemsOnBoard: 1,
     foodItemSize: 20,
+    maxGameSpeed: 50,
 }
 
 export enum Food {
