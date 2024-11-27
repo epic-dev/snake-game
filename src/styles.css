@@ -1,6 +1,6 @@
-/**
+/* 
  Minimal set of CSS rules.
- It doesn't make sense to use any framework/library (e.g. Tailwind, Bootstrap, Material, etc.) in a such small project
+ Using pure CSS for this small project instead of a framework/library
  So, I decided to keep it in pure CSS
 */
 :root {
@@ -11,6 +11,7 @@
     --panels-border-radius: 5px;
     --text-color: #3d1f1f;
     --controls-panel-bg-color: #99e299;
+    --btn-border-color: white;
 }
 body {
     margin: 0;
@@ -64,8 +65,47 @@ body {
     padding-left: .25rem;
     padding-right: .25rem;
 }
+.button {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    border-radius: 5px;
+    padding: .75rem;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
 .controls-bar .controls .button {
     background-color: var(--controls-panel-bg-color);
+    color: var(--text-color);
+    box-shadow: inset -1px -1px 2px rgb(2, 99, 17);
+}
+.controls-bar .controls .button:hover {
+    background-color: var(--btn-bg-hover-color);
+}
+.controls-bar .controls .button:active {
+    box-shadow: inset 1px 1px 2px rgb(2, 99, 17);
+    background-size: 90%;
+    background-position: center;
+}
+.restart-btn {
+    background: transparent;
+    padding: 1rem 3rem;
+    box-shadow: none;
+    border: 2px solid var(--btn-border-color);
+    color: white;
+    font-size: 1.3rem;
+}
+.restart-btn:hover {
+    background-color: rgba(0, 0, 0, .1);
+}
+.restart-btn:active {
+    background-color: rgba(0, 0, 0, .3);
+    box-shadow: none;
+}
+.settings-btn {
+    background-image: url('./assets/icons/settings.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 #score-value {
     text-align: right;
@@ -76,6 +116,7 @@ body {
     top: 0;
     left: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -91,33 +132,4 @@ body {
 }
 .gameover-message {
     font-size: 3rem;
-}
-.button {
-    font-size: 0.75rem;
-    line-height: 1rem;
-    border-radius: 5px;
-    padding: .75rem;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    color: var(--text-color);
-    box-shadow: inset -1px -1px 2px rgb(2, 99, 17);
-}
-.button:hover {
-    background-color: var(--btn-bg-hover-color);
-}
-.button:active {
-    box-shadow: inset 1px 1px 2px rgb(2, 99, 17);
-    background-size: 90%;
-    background-position: center;
-}
-.restart-btn {
-    background-image: url('./assets/icons/restart.svg');
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-.settings-btn {
-    background-image: url('./assets/icons/settings.svg');
-    background-repeat: no-repeat;
-    background-size: contain;
 }
