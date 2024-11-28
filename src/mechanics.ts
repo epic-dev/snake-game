@@ -1,5 +1,5 @@
-import { BaseDirections, Food, FoodPoints, FoodSideEffects, settings } from "./settings";
-import { FoodItem, TPosition } from "./types";
+import { BaseDirections, Food, FoodPoints, FoodSideEffects, settings } from './settings';
+import { FoodItem, TPosition } from './types';
 
 export function isEaten(headPosition: TPosition, food: FoodItem): boolean {
     const equalPositions = headPosition.x === food.position.x && headPosition.y === food.position.y;

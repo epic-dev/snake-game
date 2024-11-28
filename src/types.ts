@@ -27,6 +27,7 @@ export type TBaseSettings = {
     numberOfFoodItemsOnBoard: number,
     foodItemSize: number,
     maxGameSpeed: number,
+    gameSpeed: number,
 }
 
 export type FoodItem = {

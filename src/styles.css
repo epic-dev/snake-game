@@ -12,6 +12,9 @@
     --text-color: #3d1f1f;
     --controls-panel-bg-color: #99e299;
     --btn-border-color: white;
+    --dialog-bg-color: rgba(0, 0, 0, .5);
+    --dialog-text-color: white;
+    --dialog-border-radius: 5px;
 }
 body {
     margin: 0;
@@ -32,6 +35,8 @@ body {
 }
 .game-board-section {
     position: relative;
+    justify-items: stretch;
+    display: flex;
 }
 #game-board {
     border: 1px solid;
@@ -41,16 +46,17 @@ body {
 
 .controls-bar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin: .25rem .5rem;
     height: 2rem;
 }
+.controls-bar > * + *{
+    margin-left: .5rem;
+}
 .controls-bar > * {
-    padding-bottom: .25rem;
     border-radius: var(--panels-border-radius);
 }
-.controls-bar .score {
+.controls-bar .info {
     background-color: var(--controls-panel-bg-color);
     min-width: 12rem;
     display: flex;
@@ -61,10 +67,7 @@ body {
     color: var(--text-color);
     padding: 0 .25rem;
 }
-.controls-bar .controls {
-    padding-left: .25rem;
-    padding-right: .25rem;
-}
+
 .button {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -84,7 +87,7 @@ body {
 }
 .controls-bar .controls .button:active {
     box-shadow: inset 1px 1px 2px rgb(2, 99, 17);
-    background-size: 90%;
+    background-size: 95%;
     background-position: center;
 }
 .restart-btn {
@@ -121,8 +124,9 @@ body {
     justify-content: center;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .5);
-    color: white;
+    background-color: var(--dialog-bg-color);
+    color: var(--dialog-text-color);
+    border-radius: var(--dialog-border-radius);
 }
 .hidden {
     display: none;

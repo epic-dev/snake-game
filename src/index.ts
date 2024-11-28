@@ -1,8 +1,8 @@
 import './styles.css';
-import { BaseDirections, settings, SideEffects } from "./settings";
-import { FoodItem, TPosition } from "./types";
+import { BaseDirections, settings, SideEffects } from './settings';
+import { FoodItem, TPosition } from './types';
 import { collision, isEaten, moveDown, moveLeft, moveRight, moveUp, produceFoodItem } from './mechanics';
-import { createFoodElement, createSnakeSegment } from "./utils";
+import { createFoodElement, createSnakeSegment } from './utils';
 
 
 const Snake: TPosition[] = [settings.startingPosition];
@@ -11,10 +11,18 @@ let currentDirection = BaseDirections.Up;
 
 let gameBoard: SVGElement;
 let scoreElement: HTMLElement;
-let dialogs: HTMLElement[];
+let gameSpeedElement: HTMLElement;
+let startGameDialog: HTMLElement;
+let restartGameDialog: HTMLElement;
+let restartGameBtn: HTMLElement;
 let currentFoodItem: FoodItem = produceFoodItem();
 let score = 0;
 let invertedDirections = false;
+let afId: number | null = null;
+let frameLastUpdateTime = 0;
+const Second = 1000;
+let gameSpeed = settings.gameSpeed;
+let gameOver = false;
 
 
 // function init() {
@@ -26,13 +34,13 @@ export function callEffect(effect?: SideEffects): void {
     switch (effect) {
         case SideEffects.InvertedDirections: {
             invertedDirections = true;
-            setTimeout(() => {
+            setTimeout(() => { // cancel previous timeout in case it is running
                 invertedDirections = false;
             }, 5000); //FIXME timeout to settings
             break;
         }
         case SideEffects.SpeedBoost: {
-            GameSpeed = Math.min(GameSpeed + 5, settings.maxGameSpeed);
+            gameSpeed = Math.min(gameSpeed + 5, settings.maxGameSpeed);
             break;
         }
         default: break;
@@ -97,11 +105,6 @@ function render() {
 // ]);
 
 // let isStarted = false;
-let afId: number | null = null;
-let frameLastUpdateTime = 0;
-const Second = 1000;
-let GameSpeed = 5; // cells per second
-let gameOver = false;
 
 /**
  * Main game loop
@@ -111,7 +114,7 @@ function loop(frameCurrentTime: number) {
 
     const delta = (frameCurrentTime - frameLastUpdateTime) / Second;
 
-    if (delta < 1 / GameSpeed) {
+    if (delta < 1 / gameSpeed) {
         afId = requestAnimationFrame(loop);
         return
     }
@@ -123,26 +126,16 @@ function loop(frameCurrentTime: number) {
 
     afId = requestAnimationFrame(loop);
 }
-/**
- * Starts the game loop if it is not already running.
- * @returns {number | null} The animation frame ID or null if the game is already running.
- */
+
 function startGame(): number | null {
     // Check if the game loop is not already running
     if (afId === null) {
-
         afId = requestAnimationFrame(loop);
-
-        dialogs.forEach(dialog => dialog.classList.add('hidden'))
+        startGameDialog?.classList.add('hidden'); // TODO: could be controlled by game state
     }
     return null;
 }
 
-/**
- * Pauses the game by canceling the animation frame.
- * If `afId` is not null, it means the game is currently running.
- * Cancels the animation frame and sets `afId` to null to indicate the game is paused.
- */
 function pauseGame() {
     if (afId !== null) {
         cancelAnimationFrame(afId);
@@ -157,8 +150,24 @@ function stopGame() {
         cancelAnimationFrame(afId);
         afId = null;
 
-        dialogs.forEach(dialog => dialog.classList.remove('hidden'));
+        restartGameDialog?.classList.remove('hidden');
     }
+}
+
+function restartGame() {
+    Snake.length = 0;
+    Snake.push(settings.startingPosition);
+    currentDirection = BaseDirections.Up;
+    currentFoodItem = produceFoodItem();
+    score = 0;
+    gameOver = false;
+    gameSpeed = settings.gameSpeed;
+    if (afId !== null) {
+        cancelAnimationFrame(afId);
+    }
+    restartGameDialog?.classList.add('hidden');
+    afId = null;
+    startGame();
 }
 
 /** 
@@ -167,7 +176,12 @@ function stopGame() {
 document.addEventListener('DOMContentLoaded', () => {
     gameBoard = document.getElementById('game-board-field') as unknown as SVGElement;
     scoreElement = document.getElementById('score-value') as unknown as HTMLElement;
-    dialogs = document.querySelectorAll('.dialog') as unknown as HTMLElement[];
+    gameSpeedElement = document.getElementById('game-speed-value') as unknown as HTMLElement;
+    startGameDialog = document.querySelector('.dialog.welcome-message') as unknown as HTMLElement;
+    restartGameDialog = document.querySelector('.dialog.gameover-message') as unknown as HTMLElement;
+    restartGameBtn = document.getElementById('restart-game-btn') as unknown as HTMLElement;
+
+    gameSpeedElement.innerHTML = String(gameSpeed);
 
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
@@ -205,6 +219,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             default: break;
         }
+    });
+    restartGameBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        restartGame();
     });
     // init();
 });
