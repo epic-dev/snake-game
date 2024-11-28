@@ -73,6 +73,7 @@ function update() {
 function render() {
     const fragment = document.createDocumentFragment();
     scoreElement.innerHTML = String(score);
+    gameSpeedElement.innerHTML = String(gameSpeed);
     Snake.forEach((s) => {
         const segment = createSnakeSegment(s);
         fragment.appendChild(segment);
@@ -182,8 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
     restartGameDialog = document.querySelector('.dialog.gameover-message') as unknown as HTMLElement;
     restartGameBtn = document.getElementById('restart-game-btn') as unknown as HTMLElement;
 
-    gameSpeedElement.innerHTML = String(gameSpeed);
-
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
@@ -223,7 +222,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // init();
 });
-
-// TODO unit tests
-// - food production function
-// - next head position function

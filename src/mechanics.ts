@@ -13,8 +13,8 @@ export function isEaten(headPosition: TPosition, food: FoodItem): boolean {
 export function collision(snake: TPosition[]): boolean {
     const headPosition = snake[0];
     const tail = snake.slice(1);
-    const collideX = headPosition.x < 0 || headPosition.x === settings.frameWidth * settings.cellSize - settings.cellSize;
-    const collideY = headPosition.y < 0 || headPosition.y === settings.frameHeight * settings.cellSize - settings.cellSize;
+    const collideX = headPosition.x < 0 || headPosition.x >= settings.frameWidth * settings.cellSize;
+    const collideY = headPosition.y < 0 || headPosition.y >= settings.frameHeight * settings.cellSize;
 
     return collideX || collideY || !!tail.find(t => t.x === headPosition.x && t.y === headPosition.y);
 }
