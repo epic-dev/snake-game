@@ -41,6 +41,7 @@ export function callEffect(effect?: SideEffects): void {
         }
         case SideEffects.SpeedBoost: {
             gameSpeed = Math.min(gameSpeed + 5, settings.maxGameSpeed);
+            gameSpeedElement.innerHTML = String(gameSpeed);
             break;
         }
         default: break;
@@ -196,25 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'w':
             case 'ArrowUp': {
                 currentDirection = invertedDirections ? moveDown(currentDirection) : moveUp(currentDirection);
-                startGame();
                 break;
             }
             case 'd':
             case 'ArrowRight': {
                 currentDirection = invertedDirections ? moveLeft(currentDirection) : moveRight(currentDirection);
-                startGame();
                 break;
             }
             case 'a':
             case 'ArrowLeft': {
                 currentDirection = invertedDirections ? moveRight(currentDirection) : moveLeft(currentDirection);
-                startGame();
                 break;
             }
             case 's':
             case 'ArrowDown': {
                 currentDirection = invertedDirections ? moveUp(currentDirection) : moveDown(currentDirection);
-                startGame();
                 break;
             }
             default: break;

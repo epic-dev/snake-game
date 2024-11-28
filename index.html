@@ -16,9 +16,10 @@
                     <div class="info">
                         Game speed: <span id="game-speed-value">0</span>
                     </div>
-                    <div class="controls">
+                    <!-- TODO: settings -->
+                    <!-- <div class="controls">
                         <button type="button" class="button settings-btn" title="Game settings"></button>
-                    </div>
+                    </div> -->
                 </section>
                 <section class="game-board-section">
                     <svg id="game-board" xmlns="http://www.w3.org/2000/svg" width="800" height="600">
@@ -83,9 +84,9 @@
                         </defs>
                     </svg>
                 </div>
-                <!-- TODO: make it generic, one html-element different messages -->
+                <!-- TODO: make it generic, one html-element different messages based on the game state -->
                 <div class="dialog welcome-message">
-                    <p>Press <b>'Space'</b>, <b>'WASD'</b> or arrow keys to start the game</p>
+                    <p>Press <b>'Space'</b> to start/pause the game</p>
                 </div>
                 <div class="dialog gameover-message hidden">
                     <p>Game over ;(</p>
