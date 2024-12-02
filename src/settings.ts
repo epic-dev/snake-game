@@ -22,6 +22,8 @@ export const settings: TBaseSettings = {
     foodItemSize: 20,
     maxGameSpeed: 50,
     gameSpeed: 7,  // cells per second
+    inverseDirectionsTimeout: 30000,
+    gameSpeedBoostValue: 5,
 }
 
 export enum Food {
@@ -31,8 +33,8 @@ export enum Food {
 }
 
 export enum SideEffects {
-    InvertedDirections,
-    SpeedBoost,
+    InvertedDirections = 'InvertedDirections',
+    SpeedBoost = 'SpeedBoost',
 }
 
 export const FoodSideEffects = new Map<Food, SideEffects>([

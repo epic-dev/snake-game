@@ -28,6 +28,8 @@ export type TBaseSettings = {
     foodItemSize: number,
     maxGameSpeed: number,
     gameSpeed: number,
+    inverseDirectionsTimeout: number,
+    gameSpeedBoostValue: number,
 }
 
 export type FoodItem = {

@@ -1,46 +1,43 @@
 import './styles.css';
 import { BaseDirections, settings, SideEffects } from './settings';
-import { FoodItem, TPosition } from './types';
+import { FoodItem, TPosition, TDirections } from './types';
 import { collision, isEaten, moveDown, moveLeft, moveRight, moveUp, produceFoodItem } from './mechanics';
 import { createFoodElement, createSnakeSegment } from './utils';
+import { timeUnit } from './constants';
 
 
-const Snake: TPosition[] = [settings.startingPosition];
-
-let currentDirection = BaseDirections.Up;
-
+let snake: TPosition[];
+let currentDirection: TDirections[keyof TDirections];
 let gameBoard: SVGElement;
 let scoreElement: HTMLElement;
 let gameSpeedElement: HTMLElement;
 let startGameDialog: HTMLElement;
 let restartGameDialog: HTMLElement;
 let restartGameBtn: HTMLElement;
-let currentFoodItem: FoodItem = produceFoodItem();
-let score = 0;
-let invertedDirections = false;
-let afId: number | null = null;
-let frameLastUpdateTime = 0;
-const Second = 1000;
-let gameSpeed = settings.gameSpeed;
-let gameOver = false;
+let currentFoodItem: FoodItem;
+let score: number;
+let invertedDirections: boolean;
+let afId: number | null;
+let frameLastUpdateTime: number;
+let gameSpeed: number;
+let gameOver: boolean;
+let invertedDirectionsId: NodeJS.Timeout | null;
 
-
-// function init() {
-//     // initialize board, game settings and initial position 
-// }
-
-// FIXME make it a generic object
+// FIXME make it more generic and testable
 export function callEffect(effect?: SideEffects): void {
     switch (effect) {
         case SideEffects.InvertedDirections: {
             invertedDirections = true;
-            setTimeout(() => { // cancel previous timeout in case it is running
+            if (invertedDirectionsId) {
+                clearTimeout(invertedDirectionsId);
+            }
+            invertedDirectionsId = setTimeout(() => {
                 invertedDirections = false;
-            }, 5000); //FIXME timeout to settings
+            }, settings.inverseDirectionsTimeout);
             break;
         }
         case SideEffects.SpeedBoost: {
-            gameSpeed = Math.min(gameSpeed + 5, settings.maxGameSpeed);
+            gameSpeed = Math.min(gameSpeed + settings.gameSpeedBoostValue, settings.maxGameSpeed);
             gameSpeedElement.innerHTML = String(gameSpeed);
             break;
         }
@@ -49,14 +46,13 @@ export function callEffect(effect?: SideEffects): void {
 }
 
 function update() {
-    // update game settings, snake positioning and food cells position
     const newHead = {
-        x: Snake[0].x + (currentDirection?.x ?? BaseDirections.Right.x) * settings.cellSize,
-        y: Snake[0].y + (currentDirection?.y ?? BaseDirections.Right.y) * settings.cellSize,
+        x: snake[0].x + (currentDirection?.x ?? BaseDirections.Right.x) * settings.cellSize,
+        y: snake[0].y + (currentDirection?.y ?? BaseDirections.Right.y) * settings.cellSize,
     }
-    Snake.unshift(newHead);
+    snake.unshift(newHead);
 
-    if (collision(Snake)) {
+    if (collision(snake)) {
         stopGame();
         return
     }
@@ -66,7 +62,7 @@ function update() {
         score += currentFoodItem.points;
         currentFoodItem = produceFoodItem();
     } else {
-        Snake.pop();
+        snake.pop();
     }
 }
 
@@ -74,7 +70,7 @@ function render() {
     const fragment = document.createDocumentFragment();
     scoreElement.innerHTML = String(score);
     gameSpeedElement.innerHTML = String(gameSpeed);
-    Snake.forEach((s) => {
+    snake.forEach((s) => {
         const segment = createSnakeSegment(s);
         fragment.appendChild(segment);
     });
@@ -83,38 +79,13 @@ function render() {
     gameBoard.appendChild(fragment);
 }
 
-// enum GameStates {
-//     NotStarted,
-//     Running,
-//     Paused,
-//     Finished,
-// }
-
-// type GameState = {
-//     running: boolean,
-//     started: boolean,
-//     paused: boolean,
-//     finished: boolean,
-// }
-
-// const GameStateMap = new Map<GameStates, GameState>([
-//     [GameStates.NotStarted, {
-//         running: false,
-//         started: false,
-//         paused: false,
-//         finished: false,
-//     }]
-// ]);
-
-// let isStarted = false;
-
 /**
  * Main game loop
  */
 function loop(frameCurrentTime: number) {
     if (gameOver) { return; }
 
-    const delta = (frameCurrentTime - frameLastUpdateTime) / Second;
+    const delta = (frameCurrentTime - frameLastUpdateTime) / timeUnit;
 
     if (delta < 1 / gameSpeed) {
         afId = requestAnimationFrame(loop);
@@ -130,7 +101,6 @@ function loop(frameCurrentTime: number) {
 }
 
 function startGame(): number | null {
-    // Check if the game loop is not already running
     if (afId === null) {
         afId = requestAnimationFrame(loop);
         startGameDialog?.classList.add('hidden'); // TODO: could be controlled by game state
@@ -157,13 +127,14 @@ function stopGame() {
 }
 
 function restartGame() {
-    Snake.length = 0;
-    Snake.push(settings.startingPosition);
+    snake.length = 0;
+    snake.push(settings.startingPosition);
     currentDirection = BaseDirections.Up;
     currentFoodItem = produceFoodItem();
     score = 0;
     gameOver = false;
     gameSpeed = settings.gameSpeed;
+    invertedDirections = false;
     if (afId !== null) {
         cancelAnimationFrame(afId);
     }
@@ -172,17 +143,33 @@ function restartGame() {
     startGame();
 }
 
-/** 
- * Entry point
-*/
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
+    snake = [settings.startingPosition];
+    currentDirection = BaseDirections.Up;
+    currentFoodItem = produceFoodItem();
+    score = 0;
+    invertedDirections = false;
+    afId = null;
+    frameLastUpdateTime = 0;
+    gameSpeed = settings.gameSpeed;
+    gameOver = false;
+    invertedDirectionsId = null;
+}
+function initElements() {
     gameBoard = document.getElementById('game-board-field') as unknown as SVGElement;
     scoreElement = document.getElementById('score-value') as unknown as HTMLElement;
     gameSpeedElement = document.getElementById('game-speed-value') as unknown as HTMLElement;
     startGameDialog = document.querySelector('.dialog.welcome-message') as unknown as HTMLElement;
     restartGameDialog = document.querySelector('.dialog.gameover-message') as unknown as HTMLElement;
     restartGameBtn = document.getElementById('restart-game-btn') as unknown as HTMLElement;
+}
 
+/** 
+ * Entry point
+*/
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    initElements();
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case ' ': {
@@ -220,5 +207,4 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         restartGame();
     });
-    // init();
 });
