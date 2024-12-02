@@ -1,2 +1,27 @@
 # snake-game
-A tiny well-known game Snake
+A tiny well-known the Snake game
+
+## Getting Started
+
+### Installation
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+### Running the Game
+Start the game on http://localhost:5173/
+
+### Controls
+- Press `Space` to start/pause the game.
+- Use the arrow keys to control the direction of the snake.
+
+
+Enjoy playing the Snake game!
