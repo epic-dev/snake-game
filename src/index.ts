@@ -24,7 +24,6 @@ let gameSpeed: number;
 let gameOver: boolean;
 let invertedDirectionsId: NodeJS.Timeout | null;
 
-// FIXME make it more generic and testable
 export function callEffect(effect?: SideEffects): void {
     switch (effect) {
         case SideEffects.InvertedDirections: {
