@@ -17,7 +17,7 @@ npm run dev
 ```
 
 ### Running the Game
-Start the game on http://localhost:5173/
+Run the game on http://localhost:5173/ in development mode
 
 ### Controls
 - Press `Space` to start/pause the game.

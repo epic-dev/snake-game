@@ -5,6 +5,7 @@ import { collision, isEaten, moveDown, moveLeft, moveRight, moveUp, produceFoodI
 import { createFoodElement, createSnakeSegment } from './utils';
 import { timeUnit } from './constants';
 
+// since this ts file transpiles into module, I decided not to use OOP and classes here
 
 let snake: TPosition[];
 let currentDirection: TDirections[keyof TDirections];
