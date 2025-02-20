@@ -1,0 +1,1 @@
+export const timeUnit = 1000; // one second

@@ -1,0 +1,140 @@
+/* 
+ Minimal set of CSS rules.
+ Using pure CSS for this small project instead of a framework/library
+ So, I decided to keep it in pure CSS
+*/
+:root {
+    --main-bg-color: #f9ecd5;
+    --board-bg-color: #f9f1e2;
+    --game-pane-backdrop-color: #6fce6f;
+    --btn-bg-hover-color: #d1f0d1;
+    --panels-border-radius: 5px;
+    --text-color: #3d1f1f;
+    --controls-panel-bg-color: #99e299;
+    --btn-border-color: white;
+    --dialog-bg-color: rgba(0, 0, 0, .5);
+    --dialog-text-color: white;
+    --dialog-border-radius: 5px;
+}
+body {
+    margin: 0;
+    background-color: var(--main-bg-color);
+}
+
+.game-container {
+    width: 810px; /* fixed width for now */
+    margin: 0 auto;
+    padding-top: 5rem;
+}
+.game-panel {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--panels-border-radius);
+    padding: .25rem;
+    background-color: var(--game-pane-backdrop-color);
+}
+.game-board-section {
+    position: relative;
+    justify-items: stretch;
+    display: flex;
+}
+#game-board {
+    border: 1px solid;
+    background-color: var(--board-bg-color);
+    border-radius: var(--panels-border-radius);
+}
+
+.controls-bar {
+    display: flex;
+    align-items: center;
+    margin: .25rem .5rem;
+    height: 2rem;
+}
+.controls-bar > * + *{
+    margin-left: .5rem;
+}
+.controls-bar > * {
+    border-radius: var(--panels-border-radius);
+}
+.controls-bar .info {
+    background-color: var(--controls-panel-bg-color);
+    min-width: 12rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    padding: 0 .25rem;
+}
+
+.button {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    border-radius: 5px;
+    padding: .75rem;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+.controls-bar .controls .button {
+    background-color: var(--controls-panel-bg-color);
+    color: var(--text-color);
+    box-shadow: inset -1px -1px 2px rgb(2, 99, 17);
+}
+.controls-bar .controls .button:hover {
+    background-color: var(--btn-bg-hover-color);
+}
+.controls-bar .controls .button:active {
+    box-shadow: inset 1px 1px 2px rgb(2, 99, 17);
+    background-size: 95%;
+    background-position: center;
+}
+.restart-btn {
+    background: transparent;
+    padding: 1rem 3rem;
+    box-shadow: none;
+    border: 2px solid var(--btn-border-color);
+    color: white;
+    font-size: 1.3rem;
+}
+.restart-btn:hover {
+    background-color: rgba(0, 0, 0, .1);
+}
+.restart-btn:active {
+    background-color: rgba(0, 0, 0, .3);
+    box-shadow: none;
+}
+.settings-btn {
+    background-image: url('./assets/icons/settings.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+#score-value {
+    text-align: right;
+    margin-left: 1rem;
+}
+.dialog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dialog-bg-color);
+    color: var(--dialog-text-color);
+    border-radius: var(--dialog-border-radius);
+    backdrop-filter: blur(5px);
+}
+.hidden {
+    display: none;
+}
+.welcome-message {
+    font-size: 2rem;
+}
+.gameover-message {
+    font-size: 3rem;
+}
