@@ -1,7 +1,7 @@
 {
-  "name": "snake-game",
-  "version": "1.0.0",
-  "description": "A tiny browser game",
+  "name": "snake-game-new-build",
+  "version": "2.0.0",
+  "description": "Snake game – OOP rewrite with Canvas 2D renderer",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -10,23 +10,9 @@
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/epic-dev/snake-game.git"
-  },
-  "keywords": [
-    "snake-game",
-    "game",
-    "browser",
-    "svg",
-    "typescript"
-  ],
+  "keywords": ["snake-game", "game", "browser", "canvas", "typescript"],
   "author": "Pavel Yuruts",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/epic-dev/snake-game/issues"
-  },
-  "homepage": "https://github.com/epic-dev/snake-game#readme",
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@testing-library/dom": "^10.4.0",

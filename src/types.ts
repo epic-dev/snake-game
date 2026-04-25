@@ -1,40 +1,40 @@
-import { SideEffects } from "./settings"
-
-export type Mutable<T> = {
-    -readonly [P in keyof T]: T[P];
-}
-
 export type TPosition = {
-    x: number,
-    y: number,
-}
+    x: number;
+    y: number;
+};
 
 export type TDirections = {
-    readonly Left: { [key in keyof TPosition]: TPosition[key] },
-    readonly Right: { [key in keyof TPosition]: TPosition[key] },
-    readonly Up: { [key in keyof TPosition]: TPosition[key] },
-    readonly Down: { [key in keyof TPosition]: TPosition[key] },
-}
+    readonly Left: TPosition;
+    readonly Right: TPosition;
+    readonly Up: TPosition;
+    readonly Down: TPosition;
+};
 
 export type TBaseSettings = {
-    frameWidth: number, // number of cells horizontally
-    frameHeight: number, // number of cells vertically
-    cellSize: number, // cell size in pixels
-    startingPosition: TPosition,
-    direction: TPosition,
-    snakeColor: string,
-    numberOfAllFoodItems: number,
-    numberOfFoodItemsOnBoard: number,
-    foodItemSize: number,
-    maxGameSpeed: number,
-    gameSpeed: number,
-    inverseDirectionsTimeout: number,
-    gameSpeedBoostValue: number,
+    frameWidth: number;
+    frameHeight: number;
+    cellSize: number;
+    startingPosition: TPosition;
+    direction: TPosition;
+    snakeColor: string;
+    numberOfAllFoodItems: number;
+    numberOfFoodItemsOnBoard: number;
+    foodItemSize: number;
+    maxGameSpeed: number;
+    gameSpeed: number;
+    inverseDirectionsTimeout: number;
+    gameSpeedBoostValue: number;
+};
+
+// Moved here from settings.ts to break the circular import
+export enum SideEffects {
+    InvertedDirections = 'InvertedDirections',
+    SpeedBoost = 'SpeedBoost',
 }
 
 export type FoodItem = {
-    position: TPosition,
-    points: number,
-    effect?: SideEffects,
-    ref: string, // svg reference
-}
+    position: TPosition;
+    points: number;
+    effect?: SideEffects;
+    ref: string; // food type name used as sprite key, e.g. 'Cherries'
+};

@@ -39,6 +39,7 @@ body {
     display: flex;
 }
 #game-board {
+    display: block; /* removes the default inline gap below canvas */
     border: 1px solid;
     background-color: var(--board-bg-color);
     border-radius: var(--panels-border-radius);
